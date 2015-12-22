@@ -1,11 +1,11 @@
 # Contributing
 
 This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are expected to honor this code.
-[code-of-conduct]: http://todogroup.org/opencodeofconduct/#tilia-uri/tilia@jakobsack.de
+[code-of-conduct]: http://todogroup.org/opencodeofconduct/#tilia-xml/tilia@jakobsack.de
 
-This library is a port of [sabre/uri](http://github.com/fruux/sabre-uri). The ruby code should match the php code as good as possible. For more information refer to the [coding guidelines](https://tilia.github.io/coding_guidelines).
+This library is a port of [sabre/xml](http://github.com/fruux/sabre-xml). The ruby code should match the php code as good as possible. For more information refer to the [coding guidelines](https://tilia.github.io/coding_guidelines).
 
-If you are having an issue [search the open issues](https://github.com/tilia/tilia-uri/issues) or create an issue and we'll help point you in the right direction.
+If you are having an issue [search the open issues](https://github.com/tilia/tilia-xml/issues) or create an issue and we'll help point you in the right direction.
 
 ## Submitting a Pull Request
 
@@ -14,7 +14,7 @@ If you are having an issue [search the open issues](https://github.com/tilia/til
 * Create a topic branch for your changes
 * Ensure that you provide *documentation* and *test coverage* for your changes (patches won't be accepted without)
 * Ensure that all tests pass (`bundle exec rake`)
-* Create a [pull request](https://github.com/tilia/tilia-uri/pulls) on Github (these are also a great place to start a conversation around a patch as early as possible)
+* Create a [pull request](https://github.com/tilia/tilia-xml/pulls) on Github (these are also a great place to start a conversation around a patch as early as possible)
 
 ## Testing
 
