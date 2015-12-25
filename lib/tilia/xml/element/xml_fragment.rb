@@ -18,7 +18,7 @@ module Tilia
 
         protected
 
-        attr_accessor :xml
+        attr_writer :xml
 
         public
 
@@ -26,7 +26,7 @@ module Tilia
           @xml = xml
         end
 
-        # get_xml replaced by xml
+        attr_reader :xml
 
         # The xml_serialize metod is called during xml writing.
         #
