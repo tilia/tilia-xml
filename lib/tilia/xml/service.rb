@@ -60,14 +60,14 @@ module Tilia
       # @param [String, nil] root_element_name
       # @raise [ParseException]
       # @return [Array, Object, String]
-      def parse(input, context_uri = nil, root_element_name = nil)
+      def parse(input, context_uri = nil, root_element_name = Box.new)
         # Skip php short commings
         reader = self.reader
         reader.context_uri = context_uri
         reader.xml(input)
 
         result = reader.parse
-        root_element_name.replace(result['name'])
+        root_element_name.value = result['name']
         result['value']
       end
 

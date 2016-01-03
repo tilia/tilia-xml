@@ -34,9 +34,9 @@ module Tilia
   <child>value</child>
 </root>
 XML
-        root_element = ''
+        root_element = Box.new('')
         result = @util.parse(xml, nil, root_element)
-        assert_equal('{http://sabre.io/ns}root', root_element)
+        assert_equal('{http://sabre.io/ns}root', root_element.value)
 
         expected = [
           {
@@ -59,9 +59,9 @@ XML
         stream.write xml
         stream.rewind
 
-        root_element = ''
+        root_element = Box.new('')
         result = @util.parse(stream, nil, root_element)
-        assert_equal('{http://sabre.io/ns}root', root_element)
+        assert_equal('{http://sabre.io/ns}root', root_element.value)
 
         expected = [
           {

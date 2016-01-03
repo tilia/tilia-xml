@@ -20,4 +20,12 @@ module Tilia
     require 'tilia/xml/version'
     require 'tilia/xml/writer'
   end
+
+  class Box
+    attr_accessor :value
+
+    def initialize(v = nil)
+      @value = v
+    end
+  end
 end
