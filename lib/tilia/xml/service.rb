@@ -57,7 +57,7 @@ module Tilia
       #
       # @param [String, File, StringIO] input
       # @param [String, nil] context_uri
-      # @param [String, nil] root_element_name
+      # @param [Tilia::Box, nil] root_element_name
       # @raise [ParseException]
       # @return [Array, Object, String]
       def parse(input, context_uri = nil, root_element_name = Box.new)
