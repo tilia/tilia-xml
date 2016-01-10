@@ -141,7 +141,7 @@ module Tilia
         end
       end
 
-      # TODO: document
+      # Initilizes the xml service
       def initialize
         @element_map = {}
         @namespace_map = {}

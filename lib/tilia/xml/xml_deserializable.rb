@@ -21,7 +21,7 @@ module Tilia
       # the next element.
       #
       # @param [Reader] _reader
-      # @return mixed
+      # @return [Object]
       def xml_deserialize(_reader)
       end
     end

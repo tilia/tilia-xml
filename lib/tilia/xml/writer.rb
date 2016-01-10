@@ -22,26 +22,26 @@ module Tilia
     class Writer
       include ContextStackTrait
 
-      protected
+      # @!attribute [r] _adhoc_namespaces
+      #   @!visibility private
+      #
+      #   Any namespace that the writer is asked to write, will be added here.
+      #
+      #   Any of these elements will get a new namespace definition *every single
+      #   time* they are used, but this array allows the writer to make sure that
+      #   the prefixes are consistent anyway.
+      #
+      #   @return [Hash]
 
-      # Any namespace that the writer is asked to write, will be added here.
+      # @!attribute [r] _namespaces_written
+      #   @!visibility private
       #
-      # Any of these elements will get a new namespace definition *every single
-      # time* they are used, but this array allows the writer to make sure that
-      # the prefixes are consistent anyway.
+      #   When the first element is written, this flag is set to true.
       #
-      # @return [Hash]
-      attr_accessor :adhoc_namespaces
-
-      # When the first element is written, this flag is set to true.
+      #   This ensures that the namespaces in the namespaces map are only written
+      #   once.
       #
-      # This ensures that the namespaces in the namespaces map are only written
-      # once.
-      #
-      # @return [Boolean]
-      attr_accessor :namespaces_written
-
-      public
+      #   @return [Boolean]
 
       # Writes a value to the output stream.
       #
@@ -233,26 +233,34 @@ module Tilia
         end
       end
 
-      # TODO: document this
+      # Initializes the instance variables
       def initialize
         @adhoc_namespaces = {}
         @namespaces_written = false
         initialize_context_stack_attributes
       end
 
-      # TODO: documentation
+      # Fakes the php function open_memory
+      #
+      # Initilizes the LibXML Writer
+      #
+      # @return [void]
       def open_memory
         fail 'XML document already created' if @writer
 
         @writer = ::LibXML::XML::Writer.string
       end
 
-      # TODO: documentation
+      # Fakes the php function output_memory
+      #
+      # @return [String]
       def output_memory
         @writer.result
       end
 
-      # TODO: documentation
+      # Delegates missing methods to XML::Writer instance
+      #
+      # @return [void]
       def method_missing(name, *args)
         @writer.send(name, *args)
       end

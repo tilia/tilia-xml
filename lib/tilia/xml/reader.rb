@@ -211,12 +211,18 @@ module Tilia
         attributes
       end
 
-      # TODO: document this
+      # Initializes instance variables
+      #
+      # Initializes instance variables from the context stack
       def initialize
         initialize_context_stack_attributes
       end
 
-      # TODO: documentation
+      # Fakes PHP method xml
+      #
+      # Creates a new XML::Reader instance
+      #
+      # @return [XML::Reader]
       def xml(input)
         fail 'XML document already loaded' if @reader
 
@@ -231,7 +237,9 @@ module Tilia
         end
       end
 
-      # TODO: documentation
+      # Delegates missing methods to XML::Reader instance
+      #
+      # @return [void]
       def method_missing(name, *args)
         @reader.send(name, *args)
       end

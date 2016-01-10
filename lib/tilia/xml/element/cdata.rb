@@ -11,14 +11,12 @@ module Tilia
       class Cdata
         include XmlSerializable
 
-        protected
-
-        # CDATA element value.
+        # @!attribute [r] _value
+        #   @!visibility private
         #
-        # @return [String]
-        attr_accessor :value
-
-        public
+        #   CDATA element value.
+        #
+        #   @return [String]
 
         # Constructor
         #

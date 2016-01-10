@@ -25,14 +25,12 @@ module Tilia
       class Elements
         include Element
 
-        protected
-
-        # Value to serialize
+        # @!attribute [r] _value
+        #   @!visibility private
         #
-        # @return [Array]
-        attr_accessor :value
-
-        public
+        #   Value to serialize
+        #
+        #   @return [Array]
 
         # Constructor
         #

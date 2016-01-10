@@ -42,14 +42,12 @@ module Tilia
       # @return [Hash]
       attr_accessor :namespace_map
 
-      protected
-
+      # @!attribute [r] _context_stack
+      #   @!visibility private
+      #
       # Backups of previous contexts.
       #
       # @return [Array]
-      attr_accessor :context_stack
-
-      public
 
       # Create a new "context".
       #
@@ -87,7 +85,7 @@ module Tilia
         ) = @context_stack.pop
       end
 
-      # TODO: document
+      # Initializes instance variables
       def initialize_context_stack_attributes
         @element_map = {}
         @namespace_map = {}

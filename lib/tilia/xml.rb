@@ -21,6 +21,7 @@ module Tilia
     require 'tilia/xml/writer'
   end
 
+  # Container to avoid pass-by-reference quirks
   class Box
     attr_accessor :value
 

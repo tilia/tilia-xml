@@ -9,12 +9,10 @@ module Tilia
       class Base
         include Element
 
-        protected
-
-        # PHP value to serialize.
-        attr_accessor :value
-
-        public
+        # @!attribute [r] _value
+        #   @!visibility private
+        #
+        #   PHP value to serialize.
 
         # Constructor
         #

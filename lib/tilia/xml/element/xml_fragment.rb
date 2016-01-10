@@ -16,11 +16,12 @@ module Tilia
       class XmlFragment
         include Element
 
-        protected
-
-        attr_writer :xml
-
-        public
+        # @!attribute [r] _xml
+        #   @!visibility private
+        #
+        #   XML fragment
+        #
+        #   @return [String]
 
         def initialize(xml)
           @xml = xml

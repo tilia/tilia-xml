@@ -14,14 +14,12 @@ module Tilia
       class Uri
         include Element
 
-        protected
-
+        # @!attribute [r] _value
+        #   @!visibility private
+        #
         # Uri element value.
         #
         # @return [String]
-        attr_accessor :value
-
-        public
 
         # Constructor
         #
