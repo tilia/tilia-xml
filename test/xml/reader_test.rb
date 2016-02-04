@@ -9,7 +9,7 @@ module Tilia
         @reader = Reader.new
       end
 
-      def test_should_load_clark
+      def test_get_clark
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns" />
@@ -19,7 +19,7 @@ BLA
         assert_equal('{http://sabredav.org/ns}root', @reader.clark)
       end
 
-      def test_should_get_clark_without_ns
+      def test_get_clark_no_ns
         input = <<BLA
 <?xml version="1.0"?>
 <root />
@@ -29,7 +29,7 @@ BLA
         assert_equal('{}root', @reader.clark)
       end
 
-      def test_should_load_clark_on_an_element
+      def test_get_clark_not_on_an_element
         input = <<BLA
 <?xml version="1.0"?>
 <root />
@@ -38,7 +38,7 @@ BLA
         assert_nil(@reader.clark)
       end
 
-      def test_should_parse_a_simple_xml_file
+      def test_simple
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -79,7 +79,7 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_work_with_cdata
+      def test_cdata
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -104,7 +104,7 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_read_simple_namespaced_attributes
+      def test_simple_namespaced_attribute
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns" xmlns:foo="urn:foo">
@@ -131,7 +131,7 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_read_mapped_elements
+      def test_mapped_element
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -159,7 +159,26 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_activate_mapped_element_callbacks
+      def test_mapped_element_bad_class
+        input = <<BLA
+<?xml version="1.0"?>
+<root xmlns="http://sabredav.org/ns">
+  <elem1 />
+</root>
+BLA
+
+        reader = Reader.new
+        reader.element_map = {
+          '{http://sabredav.org/ns}elem1' => Class.new
+        }
+        reader.xml(input)
+
+        assert_raises(RuntimeError) do
+          reader.parse
+        end
+      end
+
+      def test_mapped_element_call_back
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -190,7 +209,7 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_read_text
+      def test_read_text
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -221,7 +240,7 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_raise_exceptions
+      def test_parse_problem
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -234,7 +253,7 @@ BLA
         assert_raises(LibXmlException) { @reader.parse }
       end
 
-      def test_should_handle_broken_parser
+      def test_broken_parser_class
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -248,7 +267,7 @@ BLA
         assert_raises(ParseException) { @reader.parse }
       end
 
-      def test_should_handle_invalid_xml
+      def test_broken_xml
         input = <<BLA
 <test>
 <hello>
@@ -259,7 +278,7 @@ BLA
         assert_raises(LibXmlException) { @reader.parse }
       end
 
-      def test_should_handle_invalid_xml_2
+      def test_broken_xml2
         input = <<BLA
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions>
@@ -277,7 +296,7 @@ BLA
         assert_raises(LibXmlException) { @reader.parse }
       end
 
-      def test_should_parse_an_inner_tree
+      def test_parse_inner_tree
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -321,7 +340,7 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_use_parse_get_elements
+      def test_parse_get_elements
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -365,7 +384,7 @@ BLA
         assert_equal(expected, output)
       end
 
-      def test_should_work_with_no_elements
+      def test_parse_get_elements_no_elements
         input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">

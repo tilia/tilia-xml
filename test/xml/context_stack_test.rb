@@ -32,9 +32,6 @@ module Tilia
 
     class ContextStackMock
       include ContextStackTrait
-      def initialize
-        initialize_context_stack_attributes
-      end
     end
   end
 end

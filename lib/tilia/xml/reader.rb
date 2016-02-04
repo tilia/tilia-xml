@@ -162,20 +162,8 @@ module Tilia
 
         attributes = parse_attributes if self.has_attributes?
 
-        if @element_map.key? name
-          deserializer = @element_map[name]
+        value = deserializer_for_element_name(name).call(self)
 
-          if deserializer.is_a?(Class) && deserializer.include?(XmlDeserializable)
-            value = deserializer.xml_deserialize(self)
-          elsif deserializer.is_a? Proc
-            value = deserializer.call(self)
-          else
-            # Omit php stuff for error creation
-            fail "Could not use this type as a deserializer: #{deserializer.inspect}"
-          end
-        else
-          value = Element::Base.xml_deserialize(self)
-        end
         {
           'name'       => name,
           'value'      => value,
@@ -211,13 +199,6 @@ module Tilia
         attributes
       end
 
-      # Initializes instance variables
-      #
-      # Initializes instance variables from the context stack
-      def initialize
-        initialize_context_stack_attributes
-      end
-
       # Fakes PHP method xml
       #
       # Creates a new XML::Reader instance
@@ -235,6 +216,23 @@ module Tilia
         else
           fail 'Unable to load XML document'
         end
+      end
+
+
+      # Returns the function that should be used to parse the element identified
+      # by it's clark-notation name.
+      #
+      # @param [String] name
+      # @return [#call]
+      def deserializer_for_element_name(name)
+        return Element::Base.method(:xml_deserialize) unless @element_map.key?(name)
+
+        deserializer = @element_map[name]
+        return deserializer if deserializer.respond_to?(:call)
+
+        return deserializer.method(:xml_deserialize) if deserializer.include?(XmlDeserializable)
+
+        fail "Could not use this type as a deserializer: #{deserializer.inspect} for element: #{name}"
       end
 
       # Delegates missing methods to XML::Reader instance

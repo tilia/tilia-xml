@@ -25,7 +25,33 @@ module Tilia
       # @return [Hash]
       attr_accessor :namespace_map
 
-      # Returns a fresh XML Reader
+      # This is a list of custom serializers for specific classes.
+      #
+      # The writer may use this if you attempt to serialize an object with a
+      # class that does not implement XmlSerializable.
+      #
+      # Instead it will look at this classmap to see if there is a custom
+      # serializer here. This is useful if you don't want your value objects
+      # to be responsible for serializing themselves.
+      #
+      # The keys in this classmap need to be fully qualified PHP class names,
+      # the values must be callbacks. The callbacks take two arguments. The
+      # writer class, and the value that must be written.
+      #
+      # function (Writer writer, object value)
+      #
+      # @return [Hash]
+      attr_accessor :class_map
+
+      # Initializes the xml service
+      def initialize
+        @element_map = {}
+        @namespace_map = {}
+        @class_map = {}
+        @value_object_map = {}
+      end
+
+       # Returns a fresh XML Reader
       #
       # @return [Reader]
       def reader
@@ -40,6 +66,7 @@ module Tilia
       def writer
         writer = Writer.new
         writer.namespace_map = @namespace_map
+        writer.class_map = @class_map
         writer
       end
 
@@ -81,19 +108,20 @@ module Tilia
       # This is useful in cases where you expected a specific document to be
       # passed, and reduces the amount of if statements.
       #
-      # @param [String] root_element_name
+      # @param [String, Array<String>] root_element_name
       # @param [String, File, StringIO] input
       # @param [String, nil] context_uri
       # @return [void]
       def expect(root_element_name, input, context_uri = nil)
-        # Skip php short commings
+        root_element_name = [root_element_name] unless root_element_name.is_a?(Array)
+
         reader = self.reader
         reader.context_uri = context_uri
         reader.xml(input)
 
         result = reader.parse
-        if root_element_name != result['name']
-          fail Tilia::Xml::ParseException, "Expected #{root_element_name} but received #{result['name']} as the root element"
+        unless root_element_name.include?(result['name'])
+          fail Tilia::Xml::ParseException, "Expected #{root_element_name.join(' or ')} but received #{result['name']} as the root element"
         end
         result['value']
       end
@@ -125,6 +153,68 @@ module Tilia
         writer.output_memory
       end
 
+       # Map an xml element to a PHP class.
+      #
+      # Calling this function will automatically setup the Reader and Writer
+      # classes to turn a specific XML element to a PHP class.
+      #
+      # For example, given a class such as :
+      #
+      # class Author {
+      #   public first_name
+      #   public last_name
+      # }
+      #
+      # and an XML element such as:
+      #
+      # <author xmlns="http://example.org/ns">
+      #   <firstName>...</firstName>
+      #   <lastName>...</lastName>
+      # </author>
+      #
+      # These can easily be mapped by calling:
+      #
+      # service.map_value_object('{http://example.org}author', 'Author')
+      #
+      # @param [String] element_name
+      # @param [Class] klass
+      # @return [void]
+      def map_value_object(element_name, klass)
+        namespace = Service.parse_clark_notation(element_name).first
+
+        @element_map[element_name] = lambda do |reader|
+          return Deserializer.value_object(reader, klass, namespace)
+        end
+        @class_map[klass] = lambda do |writer, value_object|
+          return Serializer.value_object(writer, value_object, namespace)
+        end
+        @value_object_map[klass] = element_name
+      end
+
+      # Writes a value object.
+      #
+      # This function largely behaves similar to write, except that it's
+      # intended specifically to serialize a Value Object into an XML document.
+      #
+      # The ValueObject must have been previously registered using
+      # map_value_object.
+      #
+      # @param object
+      # @param [String] context_uri
+      # @return [void]
+      def write_value_object(object, context_uri = nil)
+        unless @value_object_map.key?(object.class)
+          fail ArgumentError,
+              "'#{object.class}' is not a registered value object class. Register your class with mapValueObject"
+        end
+
+        write(
+          @value_object_map[object.class],
+          object,
+          context_uri
+        )
+      end
+
       # Parses a clark-notation string, and returns the namespace and element
       # name components.
       #
@@ -132,19 +222,13 @@ module Tilia
       #
       # @param [String] str
       # @raise [InvalidArgumentException]
-      # @return [Array]
+      # @return [Array(String, String)]
       def self.parse_clark_notation(str)
         if str =~ /^{([^}]*)}(.*)/
-          [Regexp.last_match[1], Regexp.last_match[2]]
+          [Regexp.last_match[1] || '', Regexp.last_match[2]]
         else
           fail ArgumentError, "'#{str}' is not a valid clark-notation formatted string"
         end
-      end
-
-      # Initilizes the xml service
-      def initialize
-        @element_map = {}
-        @namespace_map = {}
       end
     end
   end

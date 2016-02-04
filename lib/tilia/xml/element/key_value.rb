@@ -81,26 +81,7 @@ module Tilia
         # @param [Reader] reader
         # @return mixed
         def self.xml_deserialize(reader)
-          # If there's no children, we don't do anything.
-          if reader.empty_element?
-            reader.next
-            return {}
-          end
-
-          values = {}
-
-          reader.read
-          loop do
-            if reader.node_type == ::LibXML::XML::Reader::TYPE_ELEMENT
-              clark = reader.clark
-              values[clark] = reader.parse_current_element['value']
-            else
-              reader.read
-            end
-            break unless reader.node_type != ::LibXML::XML::Reader::TYPE_END_ELEMENT
-          end
-          reader.read
-          values
+          Deserializer.key_value(reader)
         end
       end
     end

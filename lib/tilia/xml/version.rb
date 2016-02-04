@@ -3,7 +3,7 @@ module Tilia
     # This class contains the version number for this package.
     class Version
       # Full version number
-      VERSION = '1.2.0.2'
+      VERSION = '1.3.0'.freeze
     end
   end
 end

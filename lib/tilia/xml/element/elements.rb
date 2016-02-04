@@ -57,9 +57,7 @@ module Tilia
         # @param [Writer] writer
         # @return [void]
         def xml_serialize(writer)
-          @value.each do |val|
-            writer.write_element(val)
-          end
+          Serializer.enum(writer, @value)
         end
 
         # The deserialize method is called during xml parsing.
@@ -82,24 +80,7 @@ module Tilia
         # @param [Reader] reader
         # @return mixed
         def self.xml_deserialize(reader)
-          # If there's no children, we don't do anything.
-          if reader.empty_element?
-            reader.next
-            return []
-          end
-          reader.read
-          current_depth = reader.depth
-
-          values = []
-          loop do
-            if reader.node_type == ::LibXML::XML::Reader::TYPE_ELEMENT
-              values << reader.clark
-            end
-            break unless reader.depth >= current_depth && reader.next
-          end
-
-          reader.next
-          values
+          Deserializer.enum(reader)
         end
       end
     end

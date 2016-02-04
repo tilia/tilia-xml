@@ -5,7 +5,7 @@ module Tilia
     module XmlDeserializable
       # The deserialize method is called during xml parsing.
       #
-      # This method is called statictly, this is because in theory this method
+      # This method is called statictlly, this is because in theory this method
       # may be used as a type of constructor, or factory method.
       #
       # Often you want to return an instance of the current class, but you are
@@ -22,7 +22,7 @@ module Tilia
       #
       # @param [Reader] _reader
       # @return [Object]
-      def xml_deserialize(_reader)
+      def xml_deserialize(reader)
       end
     end
   end

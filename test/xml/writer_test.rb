@@ -17,9 +17,6 @@ module Tilia
         assert_equal(output, @writer.output_memory)
       end
 
-      # rubocop:disable Style/ClosingParenthesisIndentation
-      # Rubocop has a problem with the closing parenthesis of the long compare()
-      # statements, but IMO that's the best way.
       def test_simple
         compare(
           { '{http://sabredav.org/ns}root' => 'text' },
@@ -31,7 +28,9 @@ HI
       end
 
       def test_simple_quotes
-        compare({ '{http://sabredav.org/ns}root' => '"text"' }, <<HI
+        compare(
+          { '{http://sabredav.org/ns}root' => '"text"' },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">&quot;text&quot;</s:root>
 HI
@@ -47,7 +46,8 @@ HI
                 'attr1' => 'attribute value'
               }
             }
-          }, <<HI
+          },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns" attr1="attribute value">text</s:root>
 HI
@@ -83,7 +83,8 @@ HI
                 }
               }
             }
-          }, <<HI
+          },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">
  <single>value</single>
@@ -99,7 +100,9 @@ HI
       end
 
       def test_null
-        compare({ '{http://sabredav.org/ns}root' => nil }, <<HI
+        compare(
+          { '{http://sabredav.org/ns}root' => nil },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns"/>
 HI
@@ -118,10 +121,32 @@ HI
                 }
               }
             ]
-          }, <<HI
+          },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">
  <s:elem1 attr1="attribute value">text</s:elem1>
+</s:root>
+HI
+        )
+      end
+
+      def test_array_format2_no_value
+         compare(
+           {
+            '{http://sabredav.org/ns}root' => [
+              {
+                'name'       => '{http://sabredav.org/ns}elem1',
+                'attributes' => {
+                  'attr1' => 'attribute value',
+                },
+              },
+            ],
+          },
+          <<HI
+<?xml version="1.0"?>
+<s:root xmlns:s="http://sabredav.org/ns">
+ <s:elem1 attr1="attribute value"/>
 </s:root>
 HI
         )
@@ -133,7 +158,8 @@ HI
             '{http://sabredav.org/ns}root' => {
               '{urn:foo}elem1' => 'bar'
             }
-          }, <<HI
+          },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">
  <x1:elem1 xmlns:x1="urn:foo">bar</x1:elem1>
@@ -144,7 +170,9 @@ HI
 
       def test_empty_namespace
         # Empty namespaces are allowed, so we should support this.
-        compare({ '{http://sabredav.org/ns}root' => { '{}elem1' => 'bar' } }, <<HI
+        compare(
+          { '{http://sabredav.org/ns}root' => { '{}elem1' => 'bar' } },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">
  <elem1 xmlns="">bar</elem1>
@@ -167,7 +195,8 @@ HI
                 }
               }
             ]
-          }, <<HI
+          },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">
  <s:elem1 attr1="val1" s:attr2="val2" x1:attr3="val3" xmlns:x1="urn:foo">text</s:elem1>
@@ -190,7 +219,9 @@ HI
       end
 
       def test_base_element
-        compare({ '{http://sabredav.org/ns}root' => Tilia::Xml::Element::Base.new('hello') }, <<HI
+        compare(
+          { '{http://sabredav.org/ns}root' => Tilia::Xml::Element::Base.new('hello') },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">hello</s:root>
 HI
@@ -198,7 +229,9 @@ HI
       end
 
       def test_element_obj
-        compare({ '{http://sabredav.org/ns}root' => Tilia::Xml::Element::Mock.new }, <<HI
+        compare(
+          { '{http://sabredav.org/ns}root' => Tilia::Xml::Element::Mock.new },
+          <<HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns">
  <s:elem1>hiiii!</s:elem1>
@@ -209,7 +242,22 @@ HI
 
       def test_empty_namespace_prefix
         @writer.namespace_map['http://sabredav.org/ns'] = nil
-        compare({ '{http://sabredav.org/ns}root' => Tilia::Xml::Element::Mock.new }, <<HI
+        compare(
+          { '{http://sabredav.org/ns}root' => Tilia::Xml::Element::Mock.new },
+          <<HI
+<?xml version="1.0"?>
+<root xmlns="http://sabredav.org/ns">
+ <elem1>hiiii!</elem1>
+</root>
+HI
+        )
+      end
+
+      def test_empty_namespace_prefix_empty_string
+         @writer.namespace_map['http://sabredav.org/ns'] = ''
+        compare(
+          { '{http://sabredav.org/ns}root' => Element::Mock.new },
+          <<HI
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
  <elem1>hiiii!</elem1>
@@ -254,7 +302,62 @@ HI
 HI
         assert_equal(output, @writer.output_memory)
       end
-      # rubocop:enable Style/ClosingParenthesisIndentation
+
+      def test_callback
+        compare(
+          {
+            '{http://sabredav.org/ns}root' => lambda do |writer|
+                writer.write_string('deferred writer')
+            end
+          },
+          <<HI
+<?xml version="1.0"?>
+<s:root xmlns:s="http://sabredav.org/ns">deferred writer</s:root>
+HI
+        )
+      end
+
+      def test_resource
+        assert_raises(ArgumentError) do
+          compare(
+            { '{http://sabredav.org/ns}root' => StringIO.new },
+            <<HI
+<?xml version="1.0"?>
+<s:root xmlns:s="http://sabredav.org/ns">deferred writer</s:root>
+HI
+          )
+        end
+      end
+
+      def test_class_map
+        obj = TestClass.new('value1', 'value2')
+
+        @writer.class_map[TestClass] = lambda do |writer, value|
+          [:@key1, :@key2].each do |key|
+            val = value.instance_variable_get(key)
+            key = key.to_s[1..-1]
+            writer.write_element("{http://sabredav.org/ns}#{key}", val)
+          end
+        end
+
+        compare(
+          { '{http://sabredav.org/ns}root' => obj },
+          <<HI
+<?xml version="1.0"?>
+<s:root xmlns:s="http://sabredav.org/ns">
+ <s:key1>value1</s:key1>
+ <s:key2>value2</s:key2>
+</s:root>
+HI
+        )
+      end
+    end
+
+    class TestClass
+      def initialize a, b
+        @key1 = a
+        @key2 = b
+      end
     end
   end
 end

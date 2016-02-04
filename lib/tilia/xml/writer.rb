@@ -22,27 +22,6 @@ module Tilia
     class Writer
       include ContextStackTrait
 
-      # @!attribute [r] _adhoc_namespaces
-      #   @!visibility private
-      #
-      #   Any namespace that the writer is asked to write, will be added here.
-      #
-      #   Any of these elements will get a new namespace definition *every single
-      #   time* they are used, but this array allows the writer to make sure that
-      #   the prefixes are consistent anyway.
-      #
-      #   @return [Hash]
-
-      # @!attribute [r] _namespaces_written
-      #   @!visibility private
-      #
-      #   When the first element is written, this flag is set to true.
-      #
-      #   This ensures that the namespaces in the namespaces map are only written
-      #   once.
-      #
-      #   @return [Boolean]
-
       # Writes a value to the output stream.
       #
       # The following values are supported:
@@ -84,53 +63,7 @@ module Tilia
       # @param value
       # @return [void]
       def write(value)
-        if value.is_a?(Numeric) || value.is_a?(String)
-          write_string(value.to_s)
-        elsif value.is_a?(TrueClass) || value.is_a?(FalseClass)
-          write_string(value.to_s)
-        elsif value.is_a? XmlSerializable
-          value.xml_serialize(self)
-        elsif value.nil?
-          # noop
-        elsif value.is_a?(Hash) || value.is_a?(Array)
-          # Code for ruby implementation
-          if value.is_a?(Array)
-            hash = {}
-            value.each_with_index do |v, i|
-              hash[i] = v
-            end
-            value = hash
-          end
-
-          value.each do |name, item|
-            if name.is_a? Fixnum
-              # This item has a numeric index. We expect to be an array with a name and a value.
-              unless item.is_a?(Hash) && item.key?('name') && item.key?('value')
-                fail ArgumentError, 'When passing an array to ->write with numeric indices, every item must be an array containing the "name" and "value" key'
-              end
-
-              attributes = item.key?('attributes') ? item['attributes'] : []
-              name = item['name']
-              item = item['value']
-            elsif item.is_a?(Hash) && item.key?('value')
-              # This item has a text index. We expect to be an array with a value and optional attributes.
-              attributes = item.key?('attributes') ? item['attributes'] : []
-              item = item['value']
-            else
-              # If it's an array with text-indices, we expect every item's
-              # key to be an xml element name in clark notation.
-              # No attributes can be passed.
-              attributes = []
-            end
-
-            start_element(name)
-            write_attributes(attributes)
-            write(item)
-            end_element
-          end
-        else
-          fail ArgumentError, "The writer cannot serialize objects of type: #{value.class}"
-        end
+        Serializer.standard_serializer(self, value)
       end
 
       # Starts an element.
@@ -141,16 +74,19 @@ module Tilia
         if name[0] == '{'
           (namespace, local_name) = Service.parse_clark_notation(name)
 
-          if @namespace_map.key? namespace
-            result = start_element_ns(@namespace_map[namespace], local_name, nil)
+
+          if @namespace_map.key?(namespace)
+            ns = @namespace_map[namespace]
+            ns = nil if ns.blank?
+            result = start_element_ns(ns, local_name, nil)
           else
             # An empty namespace means it's the global namespace. This is
             # allowed, but it mustn't get a prefix.
-            if namespace == ''
+            if namespace.blank?
               result = start_element(local_name)
               write_attribute('xmlns', '')
             else
-              unless @adhoc_namespaces.key? namespace
+              unless @adhoc_namespaces.key?(namespace)
                 @adhoc_namespaces[namespace] = 'x' + (@adhoc_namespaces.size + 1).to_s
               end
               result = start_element_ns(@adhoc_namespaces[namespace], local_name, namespace)
@@ -162,7 +98,7 @@ module Tilia
 
         unless @namespaces_written
           @namespace_map.each do |ns, prefix|
-            write_attribute((prefix ? 'xmlns:' + prefix : 'xmlns'), ns)
+            write_attribute((prefix.present? ? 'xmlns:' + prefix : 'xmlns'), ns)
           end
           @namespaces_written = true
         end
@@ -170,9 +106,23 @@ module Tilia
         result
       end
 
-      # Write a full element tag.
+      # Write a full element tag and it's contents.
       #
       # This method automatically closes the element as well.
+      #
+      # The element name may be specified in clark-notation.
+      #
+      # Examples:
+      #
+      #    writer.write_element('{http://www.w3.org/2005/Atom}author',null)
+      #    becomes:
+      #    <author xmlns="http://www.w3.org/2005" />
+      #
+      #    writer.write_element('{http://www.w3.org/2005/Atom}author', [
+      #       '{http://www.w3.org/2005/Atom}name' => 'Evert Pot',
+      #    ])
+      #    becomes:
+      #    <author xmlns="http://www.w3.org/2005" /><name>Evert Pot</name></author>
       #
       # @param [String] name
       # @param [String] content
@@ -211,7 +161,7 @@ module Tilia
       def write_attribute(name, value)
         if name[0] == '{'
           (namespace, local_name) = Service.parse_clark_notation(name)
-          if @namespace_map.key? namespace
+          if @namespace_map.key?(namespace)
             # It's an attribute with a namespace we know
             write_attribute(
               @namespace_map[namespace] + ':' + local_name,
@@ -237,7 +187,8 @@ module Tilia
       def initialize
         @adhoc_namespaces = {}
         @namespaces_written = false
-        initialize_context_stack_attributes
+
+        super
       end
 
       # Fakes the php function open_memory
@@ -259,8 +210,6 @@ module Tilia
       end
 
       # Delegates missing methods to XML::Writer instance
-      #
-      # @return [void]
       def method_missing(name, *args)
         @writer.send(name, *args)
       end

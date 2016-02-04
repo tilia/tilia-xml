@@ -142,7 +142,49 @@ XML
         assert_equal(expected, result)
       end
 
-      def test_parse_clark_notation
+      def test_map_value_object
+         input = <<XML
+<?xml version="1.0"?>
+<order xmlns="http://sabredav.org/ns">
+ <id>1234</id>
+ <amount>99.99</amount>
+ <description>black friday deal</description>
+ <status>
+  <id>5</id>
+  <label>processed</label>
+ </status>
+</order>
+XML
+
+        ns = 'http://sabredav.org/ns'
+        order_service = Service.new
+        order_service.map_value_object("{#{ns}}order", Xml::Order)
+        order_service.map_value_object("{#{ns}}status", Xml::OrderStatus)
+        order_service.namespace_map[ns] = nil
+
+        order = order_service.parse(input)
+        expected = Order.new
+        expected.id = '1234'
+        expected.amount = '99.99'
+        expected.description = 'black friday deal'
+        expected.status = OrderStatus.new
+        expected.status.id = '5'
+        expected.status.label = 'processed'
+
+        assert_instance_equal(expected, order)
+
+        written_xml = order_service.write_value_object(order)
+        assert_equal(input, written_xml)
+      end
+
+      def test_write_vo_not_found
+        service = Service.new
+        assert_raises(ArgumentError) do
+          service.write_value_object(Class.new)
+        end
+      end
+
+       def test_parse_clark_notation
         expected = ['http://sabredav.org/ns', 'elem']
         result = Service.parse_clark_notation('{http://sabredav.org/ns}elem')
         assert_equal(expected, result)
@@ -150,6 +192,32 @@ XML
 
       def test_parse_clark_notation_fail
         assert_raises(ArgumentError) { Service.parse_clark_notation('http://sabredav.org/ns}elem') }
+      end
+    end
+
+    # asset for test_map_value_object
+    class Order
+      attr_accessor :id
+      attr_accessor :amount
+      attr_accessor :description
+      attr_accessor :status
+
+      def initialize
+        @id = nil
+        @amount = nil
+        @description = nil
+        @status = nil
+      end
+    end
+
+    # asset for test_map_value_object
+    class OrderStatus
+      attr_accessor :id
+      attr_accessor :label
+
+      def initialize
+        @id = nil
+        @label = nil
       end
     end
   end

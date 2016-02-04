@@ -42,12 +42,25 @@ module Tilia
       # @return [Hash]
       attr_accessor :namespace_map
 
-      # @!attribute [r] _context_stack
-      #   @!visibility private
+      # This is a list of custom serializers for specific classes.
       #
-      # Backups of previous contexts.
+      # The writer may use this if you attempt to serialize an object with a
+      # class that does not implement XmlSerializable.
       #
-      # @return [Array]
+      # Instead it will look at this classmap to see if there is a custom
+      # serializer here. This is useful if you don't want your value objects
+      # to be responsible for serializing themselves.
+      #
+      # The keys in this classmap need to be fully qualified PHP class names,
+      # the values must be callbacks. The callbacks take two arguments. The
+      # writer class, and the value that must be written.
+      #
+      # function (Writer writer, object value)
+      #
+      # @var array
+
+      attr_accessor :class_map
+
 
       # Create a new "context".
       #
@@ -57,20 +70,11 @@ module Tilia
       #
       # @return [void]
       def push_context
-        dup_or_obj = lambda do |obj|
-          if obj.nil?
-            nil
-          elsif obj.is_a? Fixnum
-            obj
-          else
-            obj.dup
-          end
-        end
-
         @context_stack << [
-          dup_or_obj.call(@element_map),
-          dup_or_obj.call(@context_uri),
-          dup_or_obj.call(@namespace_map)
+          @element_map.deep_dup,
+          @context_uri.deep_dup,
+          @namespace_map.deep_dup,
+          @class_map.deep_dup
         ]
       end
 
@@ -81,16 +85,20 @@ module Tilia
         (
           @element_map,
           @context_uri,
-          @namespace_map
+          @namespace_map,
+          @class_map
         ) = @context_stack.pop
       end
 
       # Initializes instance variables
-      def initialize_context_stack_attributes
+      def initialize(*args)
         @element_map = {}
         @namespace_map = {}
         @context_uri = ''
         @context_stack = []
+        @class_map = {}
+
+        super
       end
     end
   end
