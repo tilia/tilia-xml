@@ -57,8 +57,7 @@ module Tilia
       #
       # function (Writer writer, object value)
       #
-      # @var array
-
+      # @return [Hash]
       attr_accessor :class_map
 
 

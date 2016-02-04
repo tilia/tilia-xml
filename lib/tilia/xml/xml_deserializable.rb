@@ -20,7 +20,7 @@ module Tilia
       # $reader->parseInnerTree() will parse the entire sub-tree, and advance to
       # the next element.
       #
-      # @param [Reader] _reader
+      # @param [Reader] reader
       # @return [Object]
       def xml_deserialize(reader)
       end

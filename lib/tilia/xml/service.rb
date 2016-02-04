@@ -153,7 +153,7 @@ module Tilia
         writer.output_memory
       end
 
-       # Map an xml element to a PHP class.
+      # Map an xml element to a PHP class.
       #
       # Calling this function will automatically setup the Reader and Writer
       # classes to turn a specific XML element to a PHP class.

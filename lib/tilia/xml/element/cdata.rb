@@ -11,13 +11,6 @@ module Tilia
       class Cdata
         include XmlSerializable
 
-        # @!attribute [r] _value
-        #   @!visibility private
-        #
-        #   CDATA element value.
-        #
-        #   @return [String]
-
         # Constructor
         #
         # @param [String] value
@@ -25,23 +18,7 @@ module Tilia
           @value = value
         end
 
-        # The xml_serialize metod is called during xml writing.
-        #
-        # Use the writer argument to write its own xml serialization.
-        #
-        # An important note: do _not_ create a parent element. Any element
-        # implementing XmlSerializble should only ever write what's considered
-        # its 'inner xml'.
-        #
-        # The parent of the current element is responsible for writing a
-        # containing element.
-        #
-        # This allows serializers to be re-used for different element names.
-        #
-        # If you are opening new elements, you must also close them again.
-        #
-        # @param [Writer] writer
-        # @return [void]
+        # (see XmlSerializable#xml_serialize)
         def xml_serialize(writer)
           writer.write_cdata(@value)
         end

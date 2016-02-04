@@ -18,7 +18,7 @@ module Tilia
       #
       # If you are opening new elements, you must also close them again.
       #
-      # @param [Writer] _writer
+      # @param [Writer] writer
       # @return [void]
       def xml_serialize(writer)
       end

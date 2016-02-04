@@ -16,36 +16,13 @@ module Tilia
       class XmlFragment
         include Element
 
-        # @!attribute [r] _xml
-        #   @!visibility private
-        #
-        #   XML fragment
-        #
-        #   @return [String]
-
         def initialize(xml)
           @xml = xml
         end
 
         attr_reader :xml
 
-        # The xml_serialize metod is called during xml writing.
-        #
-        # Use the writer argument to write its own xml serialization.
-        #
-        # An important note: do _not_ create a parent element. Any element
-        # implementing XmlSerializble should only ever write what's considered
-        # its 'inner xml'.
-        #
-        # The parent of the current element is responsible for writing a
-        # containing element.
-        #
-        # This allows serializers to be re-used for different element names.
-        #
-        # If you are opening new elements, you must also close them again.
-        #
-        # @param [Writer] writer
-        # @return [void]
+        # (see XmlSerializable#xml_serialize)
         def xml_serialize(writer)
           reader = Reader.new
 
@@ -90,25 +67,7 @@ XML
           end
         end
 
-        # The deserialize method is called during xml parsing.
-        #
-        # This method is called statictly, this is because in theory this method
-        # may be used as a type of constructor, or factory method.
-        #
-        # Often you want to return an instance of the current class, but you are
-        # free to return other data as well.
-        #
-        # You are responsible for advancing the reader to the next element. Not
-        # doing anything will result in a never-ending loop.
-        #
-        # If you just want to skip parsing for this element altogether, you can
-        # just call reader->next();
-        #
-        # reader->parseInnerTree() will parse the entire sub-tree, and advance to
-        # the next element.
-        #
-        # @param [Reader] reader
-        # @return mixed
+        # (see XmlDeserializable#xml_deserialize)
         def self.xml_deserialize(reader)
           result = new(reader.read_inner_xml)
           reader.next

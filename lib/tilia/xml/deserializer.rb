@@ -208,7 +208,6 @@ module Tilia
         return value_object
       end
 
-
       # This deserializer helps you deserialize xml structures that look like
       # this:
       #
