@@ -22,7 +22,7 @@ XML
 
           expected = [
             'foo',
-            'bar',
+            'bar'
           ]
 
           assert_equal(expected, result)

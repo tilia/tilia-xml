@@ -51,7 +51,6 @@ module Tilia
       # @param [String, nil] namespace
       # @return [Hash]
       def self.key_value(reader, namespace = nil)
-
         # If there's no children, we don't do anything.
         if reader.empty_element?
           reader.next
@@ -78,9 +77,8 @@ module Tilia
 
         reader.read
 
-        return values
+        values
       end
-
 
       # The 'enum' deserializer parses elements into a simple list
       # without values or attributes.
@@ -129,7 +127,6 @@ module Tilia
       # @param [String, nil] namespace
       # @return [Array<String>]
       def self.enum(reader, namespace = nil)
-
         # If there's no children, we don't do anything.
         if reader.empty_element?
           reader.next
@@ -146,19 +143,18 @@ module Tilia
             next
           end
 
-          if namespace && namespace == reader.namespace_uri
-            values << reader.local_name
-          else
-            values << reader.clark
-          end
+          values << if namespace && namespace == reader.namespace_uri
+                      reader.local_name
+                    else
+                      reader.clark
+                    end
 
           break unless reader.depth >= current_depth && reader.next
         end
 
         reader.next
-        return values
+        values
       end
-
 
       # The valueObject deserializer turns an xml element into a PHP object of
       # a specific class.
@@ -205,7 +201,7 @@ module Tilia
         end
 
         reader.read
-        return value_object
+        value_object
       end
 
       # This deserializer helps you deserialize xml structures that look like

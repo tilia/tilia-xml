@@ -5,7 +5,6 @@ module Tilia
     module Deserializer
       class EnumTest < Minitest::Test
         def test_deserialize
-
           service = Service.new
           service.element_map['{urn:test}root'] = Deserializer.method(:enum)
 
@@ -20,8 +19,8 @@ XML
           result = service.parse(xml)
 
           expected = [
-              '{urn:test}foo1',
-              '{urn:test}foo2',
+            '{urn:test}foo1',
+            '{urn:test}foo2'
           ]
 
           assert_equal(expected, result)
@@ -44,8 +43,8 @@ XML
           result = service.parse(xml)
 
           expected = [
-              'foo1',
-              'foo2',
+            'foo1',
+            'foo2'
           ]
 
           assert_equal(expected, result)

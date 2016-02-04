@@ -60,7 +60,6 @@ module Tilia
       # @return [Hash]
       attr_accessor :class_map
 
-
       # Create a new "context".
       #
       # This allows you to safely modify the element_map, context_uri or

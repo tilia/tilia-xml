@@ -14,7 +14,7 @@ module Tilia
                 writer,
                 [
                   'foo',
-                  'bar',
+                  'bar'
                 ],
                 '{urn:test}item'
               )

@@ -15,7 +15,7 @@ module Tilia
                 writer,
                 [
                   '{urn:test}foo1',
-                  '{urn:test}foo2',
+                  '{urn:test}foo2'
                 ]
               )
             end

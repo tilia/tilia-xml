@@ -35,7 +35,7 @@ module Minitest
         input = Tilia::VObject::Reader.read(input) if input.is_a?(String)
 
         unless input.is_a?(Tilia::VObject::Component)
-          fail ArgumentError, 'Input must be a string, stream or VObject component'
+          raise ArgumentError, 'Input must be a string, stream or VObject component'
         end
 
         input.delete('PRODID')
@@ -70,7 +70,7 @@ module Minitest
           return false unless b.instance_variable_get(var) == b
         else
           unless a.instance_variable_get(var) == b.instance_variable_get(var) ||
-              compare_instances(a.instance_variable_get(var), b.instance_variable_get(var))
+                 compare_instances(a.instance_variable_get(var), b.instance_variable_get(var))
             return false
           end
         end

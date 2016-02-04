@@ -101,9 +101,8 @@ XML
           vo.last_name = 'Turtle'
           vo.link = [
             'http://example.org/',
-            'http://example.net/',
+            'http://example.net/'
           ]
-
 
           expected = {
             'name'       => '{urn:foo}foo',

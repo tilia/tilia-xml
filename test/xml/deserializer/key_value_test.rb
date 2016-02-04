@@ -5,7 +5,6 @@ module Tilia
     module Deserializer
       class KeyValueTest < Minitest::Test
         def test_key_value
-
           input = <<BLA
 <?xml version="1.0"?>
 <root xmlns="http://sabredav.org/ns">
@@ -42,19 +41,19 @@ BLA
                       {
                         'name'       => '{http://sabredav.org/another-ns}elem4',
                         'value'      => 'foo',
-                        'attributes' => {},
+                        'attributes' => {}
                       },
                       {
                         'name'       => '{http://sabredav.org/another-ns}elem5',
                         'value'      => 'foo & bar',
-                        'attributes' => {},
-                      },
+                        'attributes' => {}
+                      }
                     ]
                   },
-                  'attributes' => {},
+                  'attributes' => {}
                 }
               ],
-              'attributes' => {},
+              'attributes' => {}
             },
             output
           )

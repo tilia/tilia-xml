@@ -143,7 +143,7 @@ XML
       end
 
       def test_map_value_object
-         input = <<XML
+        input = <<XML
 <?xml version="1.0"?>
 <order xmlns="http://sabredav.org/ns">
  <id>1234</id>
@@ -184,7 +184,7 @@ XML
         end
       end
 
-       def test_parse_clark_notation
+      def test_parse_clark_notation
         expected = ['http://sabredav.org/ns', 'elem']
         result = Service.parse_clark_notation('{http://sabredav.org/ns}elem')
         assert_equal(expected, result)

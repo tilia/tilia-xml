@@ -88,7 +88,7 @@ module Tilia
         text = nil
         elements = []
 
-        if node_type == ::LibXML::XML::Reader::TYPE_ELEMENT && self.empty_element?
+        if node_type == ::LibXML::XML::Reader::TYPE_ELEMENT && empty_element?
           # Easy!
           self.next
           return nil
@@ -117,7 +117,7 @@ module Tilia
             read
             break
           when ::LibXML::XML::Reader::TYPE_NONE
-            fail Tilia::Xml::ParseException, 'We hit the end of the document prematurely. This likely means that some parser "eats" too many elements. Do not attempt to continue parsing.'
+            raise Tilia::Xml::ParseException, 'We hit the end of the document prematurely. This likely means that some parser "eats" too many elements. Do not attempt to continue parsing.'
           else
             # Advance to the next element
             read
@@ -160,7 +160,7 @@ module Tilia
 
         attributes = {}
 
-        attributes = parse_attributes if self.has_attributes?
+        attributes = parse_attributes if has_attributes?
 
         value = deserializer_for_element_name(name).call(self)
 
@@ -205,19 +205,18 @@ module Tilia
       #
       # @return [XML::Reader]
       def xml(input)
-        fail 'XML document already loaded' if @reader
+        raise 'XML document already loaded' if @reader
 
-        if input.is_a? String
+        if input.is_a?(String)
           @reader = ::LibXML::XML::Reader.string(input)
-        elsif input.is_a? File
+        elsif input.is_a?(File)
           @reader = ::LibXML::XML::Reader.file(input)
-        elsif input.is_a? StringIO
+        elsif input.is_a?(StringIO)
           @reader = ::LibXML::XML::Reader.io(input)
         else
-          fail 'Unable to load XML document'
+          raise 'Unable to load XML document'
         end
       end
-
 
       # Returns the function that should be used to parse the element identified
       # by it's clark-notation name.
@@ -232,7 +231,7 @@ module Tilia
 
         return deserializer.method(:xml_deserialize) if deserializer.include?(XmlDeserializable)
 
-        fail "Could not use this type as a deserializer: #{deserializer.inspect} for element: #{name}"
+        raise "Could not use this type as a deserializer: #{deserializer.inspect} for element: #{name}"
       end
 
       # Delegates missing methods to XML::Reader instance

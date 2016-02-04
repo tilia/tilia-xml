@@ -74,23 +74,20 @@ module Tilia
         if name[0] == '{'
           (namespace, local_name) = Service.parse_clark_notation(name)
 
-
           if @namespace_map.key?(namespace)
-            ns = @namespace_map[namespace]
-            ns = nil if ns.blank?
-            result = start_element_ns(ns, local_name, nil)
-          else
+            tmp_ns = @namespace_map[namespace]
+            tmp_ns = nil if tmp_ns.blank?
+            result = start_element_ns(tmp_ns, local_name, nil)
+          elsif namespace.blank?
             # An empty namespace means it's the global namespace. This is
             # allowed, but it mustn't get a prefix.
-            if namespace.blank?
-              result = start_element(local_name)
-              write_attribute('xmlns', '')
-            else
-              unless @adhoc_namespaces.key?(namespace)
-                @adhoc_namespaces[namespace] = 'x' + (@adhoc_namespaces.size + 1).to_s
-              end
-              result = start_element_ns(@adhoc_namespaces[namespace], local_name, namespace)
+            result = start_element(local_name)
+            write_attribute('xmlns', '')
+          else
+            unless @adhoc_namespaces.key?(namespace)
+              @adhoc_namespaces[namespace] = 'x' + (@adhoc_namespaces.size + 1).to_s
             end
+            result = start_element_ns(@adhoc_namespaces[namespace], local_name, namespace)
           end
         else
           result = @writer.start_element(name)
@@ -197,7 +194,7 @@ module Tilia
       #
       # @return [void]
       def open_memory
-        fail 'XML document already created' if @writer
+        raise 'XML document already created' if @writer
 
         @writer = ::LibXML::XML::Writer.string
       end

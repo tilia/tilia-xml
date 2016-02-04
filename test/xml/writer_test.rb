@@ -96,7 +96,7 @@ HI
  <verbose foo="bar">syntax</verbose>
 </s:root>
 HI
-          )
+        )
       end
 
       def test_null
@@ -106,7 +106,7 @@ HI
 <?xml version="1.0"?>
 <s:root xmlns:s="http://sabredav.org/ns"/>
 HI
-          )
+        )
       end
 
       def test_array_format2
@@ -132,16 +132,16 @@ HI
       end
 
       def test_array_format2_no_value
-         compare(
-           {
+        compare(
+          {
             '{http://sabredav.org/ns}root' => [
               {
                 'name'       => '{http://sabredav.org/ns}elem1',
                 'attributes' => {
-                  'attr1' => 'attribute value',
-                },
-              },
-            ],
+                  'attr1' => 'attribute value'
+                }
+              }
+            ]
           },
           <<HI
 <?xml version="1.0"?>
@@ -254,7 +254,7 @@ HI
       end
 
       def test_empty_namespace_prefix_empty_string
-         @writer.namespace_map['http://sabredav.org/ns'] = ''
+        @writer.namespace_map['http://sabredav.org/ns'] = ''
         compare(
           { '{http://sabredav.org/ns}root' => Element::Mock.new },
           <<HI
@@ -307,7 +307,7 @@ HI
         compare(
           {
             '{http://sabredav.org/ns}root' => lambda do |writer|
-                writer.write_string('deferred writer')
+              writer.write_string('deferred writer')
             end
           },
           <<HI
@@ -354,7 +354,7 @@ HI
     end
 
     class TestClass
-      def initialize a, b
+      def initialize(a, b)
         @key1 = a
         @key2 = b
       end

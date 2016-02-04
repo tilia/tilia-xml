@@ -51,7 +51,7 @@ module Tilia
         @value_object_map = {}
       end
 
-       # Returns a fresh XML Reader
+      # Returns a fresh XML Reader
       #
       # @return [Reader]
       def reader
@@ -121,7 +121,7 @@ module Tilia
 
         result = reader.parse
         unless root_element_name.include?(result['name'])
-          fail Tilia::Xml::ParseException, "Expected #{root_element_name.join(' or ')} but received #{result['name']} as the root element"
+          raise Tilia::Xml::ParseException, "Expected #{root_element_name.join(' or ')} but received #{result['name']} as the root element"
         end
         result['value']
       end
@@ -204,8 +204,8 @@ module Tilia
       # @return [void]
       def write_value_object(object, context_uri = nil)
         unless @value_object_map.key?(object.class)
-          fail ArgumentError,
-              "'#{object.class}' is not a registered value object class. Register your class with mapValueObject"
+          raise ArgumentError,
+                "'#{object.class}' is not a registered value object class. Register your class with mapValueObject"
         end
 
         write(
@@ -227,7 +227,7 @@ module Tilia
         if str =~ /^{([^}]*)}(.*)/
           [Regexp.last_match[1] || '', Regexp.last_match[2]]
         else
-          fail ArgumentError, "'#{str}' is not a valid clark-notation formatted string"
+          raise ArgumentError, "'#{str}' is not a valid clark-notation formatted string"
         end
       end
     end

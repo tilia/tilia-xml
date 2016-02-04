@@ -163,7 +163,7 @@ module Tilia
             if name.is_a? Fixnum
               # This item has a numeric index. We expect to be an array with a name and a value.
               unless item.is_a?(Hash) && item.key?('name')
-                fail ArgumentError, 'When passing an array to ->write with numeric indices, every item must be an array containing at least the "name" key'
+                raise ArgumentError, 'When passing an array to ->write with numeric indices, every item must be an array containing at least the "name" key'
               end
 
               attributes = item.key?('attributes') ? item['attributes'] : []
@@ -186,7 +186,7 @@ module Tilia
             writer.end_element
           end
         else
-          fail ArgumentError, "The writer cannot serialize objects of type: #{value.class}"
+          raise ArgumentError, "The writer cannot serialize objects of type: #{value.class}"
         end
       end
     end
