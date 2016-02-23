@@ -211,10 +211,8 @@ module Tilia
           @reader = ::LibXML::XML::Reader.string(input)
         elsif input.is_a?(File)
           @reader = ::LibXML::XML::Reader.file(input)
-        elsif input.is_a?(StringIO)
-          @reader = ::LibXML::XML::Reader.io(input)
         else
-          raise 'Unable to load XML document'
+          @reader = ::LibXML::XML::Reader.io(input)
         end
       end
 
