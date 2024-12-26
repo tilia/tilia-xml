@@ -160,7 +160,7 @@ module Tilia
           end
 
           value.each do |name, item|
-            if name.is_a? Fixnum
+            if name.is_a? Integer
               # This item has a numeric index. We expect to be an array with a name and a value.
               unless item.is_a?(Hash) && item.key?('name')
                 raise ArgumentError, 'When passing an array to ->write with numeric indices, every item must be an array containing at least the "name" key'
